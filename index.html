@@ -230,6 +230,27 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
 .opt{width:100%;min-height:56px;border-radius:16px;border:1px solid var(--line);background:var(--bg-2);padding:12px 16px;text-align:left;font-size:15px;font-weight:600;margin-top:10px}
 .opt:active{background:var(--card-2)}
 
+/* Buscador de dudas (busca en la app y, si no está, en internet) */
+.ask-bar{width:100%;min-height:56px;display:flex;align-items:center;gap:12px;padding:0 20px;border-radius:50px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:15px;font-weight:700;text-align:left;box-shadow:var(--shadow)}
+.ask-bar .ab-ic{font-size:20px}
+.ask-form{display:flex;gap:8px;margin-top:14px}
+.ask-form .input{flex:1;border-radius:50px;padding:12px 18px}
+.ask-form .btn{padding:0 18px;flex:0 0 auto}
+.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ask-chips .pill{min-height:44px;font-size:13.5px}
+.ask-res{width:100%;min-height:56px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;border:1px solid var(--line-soft);background:var(--bg-2);text-align:left;margin-top:8px}
+.ask-res .ar-ic{flex:0 0 38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--mint-soft)}
+.ask-res strong{display:block;font-size:15px;line-height:1.3}
+.ask-res small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ask-web{margin-top:16px;padding:16px;border-radius:16px;background:var(--yellow-soft);border:1px solid var(--line)}
+.ask-urgent{margin-top:16px;font-size:.88rem;line-height:1.5;border-left:4px solid var(--danger);padding:10px 12px;border-radius:0 12px 12px 0;background:var(--bg-2)}
+@media(max-width:400px){
+  .tb-actions{gap:4px}
+  .tb-actions .icon-btn{width:42px;height:42px;min-height:42px;font-size:18px}
+  .tb-brand{font-size:.82rem;white-space:nowrap}
+  .tb-title{font-size:1.25rem}
+}
+
 /* Modal y toast */
 .modal{position:fixed;inset:0;z-index:150;background:rgba(5,12,11,.62);display:flex;align-items:flex-end;justify-content:center;padding:0}
 .modal-box{position:relative;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:24px 24px 0 0;padding:26px 20px calc(24px + env(safe-area-inset-bottom));animation:rise .3s ease}
@@ -371,6 +392,7 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
       <div class="tb-row">
         <div><span class="tb-brand">Crecer acompañados</span><h1 id="tbTitle" class="h-serif tb-title">Inicio</h1></div>
         <div class="tb-actions">
+          <button class="icon-btn" onclick="openAsk()" aria-label="Buscar una duda">🔎</button>
           <button class="icon-btn" id="tbPrem" onclick="openPremium()" aria-label="Premium">👑</button>
           <button class="icon-btn themeBtnIcon" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
           <button class="icon-btn" onclick="openSettings()" aria-label="Ajustes">⚙️</button>
@@ -3368,6 +3390,126 @@ function applyTheme(){
 }
 function toggleTheme(){ S.theme=S.theme==="dark"?"light":"dark"; LS.set("theme",S.theme); applyTheme(); toast(S.theme==="dark"?"Modo noche activado":"Modo día activado"); }
 
+/* ===================== BUSCADOR DE DUDAS =====================
+   1) Busca primero dentro del contenido de la app.
+   2) Si no está, ofrece buscar en internet: en sitios de salud infantil confiables o en toda la web.
+   No necesita servidor ni claves: abre la búsqueda de Google en el navegador. */
+const ASK_SITES = ["sap.org.ar","healthychildren.org","unicef.org","paho.org","argentina.gob.ar"];
+const ASK_FAQ = ["Piojos","Fiebre","Moja la cama","Miente","No quiere hacer la tarea","Bullying","Pesadillas","Come poco"];
+const ASK_STOP = new Set(("que como cuando donde porque por para con sin los las del una uno unos unas mis sus tus les esta este esto hay hace tiene tengo puedo debo hacer "+
+  "nino nina ninos ninas chico chica chicos hijo hija hijos mes meses ano anos dia dias muy mas quiere quiero necesito normal bien mal poco mucho tanto algo nada todo todavia "+
+  "sale salen salio empieza empiezan empezar empezo dejar deja sacar saca hago puede pueden tienen estan anda").split(" "));
+const ASK_SYN = {
+  dormir:["dorm","sueno","siesta"],duerme:["dorm","sueno","siesta"],sueno:["dorm","sueno","siesta"],despierta:["dorm","sueno","despiert"],
+  pesadilla:["pesadilla"],pesadillas:["pesadilla"],moja:["moja","moje","enuresis"],cama:["moje la cama","moja la cama","enuresis"],
+  miente:["mient","menti"],mentir:["mient","menti"],mentiras:["mient","menti"],tarea:["tarea","deberes"],tareas:["tarea","deberes"],
+  bullying:["bullying","acoso"],acoso:["acoso","bullying"],molestan:["acoso","bullying"],
+  come:["come ","comer","comida","selectiv"],comer:["comer","comida","selectiv"],
+  dientes:["diente"],diente:["diente"],mueve:["muev"],mueven:["muev"],muevan:["muev"],fiebre:["fiebre"],
+  pantallas:["pantalla","celular","tablet"],celular:["celular","tablet","pantalla"],tablet:["tablet","celular","pantalla"],
+  berrinches:["berrinche","enojo","rabieta"],enoja:["enoj","berrinche"],miedo:["miedo"],miedos:["miedo"],
+  escuela:["escuela","escolar","colegio"],colegio:["escuela","escolar","colegio"],leer:["leer","lectura"],
+  hermano:["hermano"],hermanos:["hermano"],separacion:["separacion","separa"],divorcio:["separacion","separa"]
+};
+let ASK_INDEX = null;
+function askIndex(){
+  if(ASK_INDEX) return ASK_INDEX;
+  const W=t=>" "+norm(t).replace(/[^a-z0-9]+/g," ")+" ";
+  const ix=[], add=(ic,t,sub,txt,act)=>ix.push({ic,t,sub,tn:W(t),x:W(t+" "+txt),act});
+  const short=t=>t.length>90?t.slice(0,t.lastIndexOf(" ",88))+"…":t;
+  const seenMs={};
+  STAGES.forEach(s=>{
+    const where="Año a año · "+s.title.split(":")[0];
+    add(s.icon,s.title,where,s.foodIntro||"",()=>goMonth(s.from,"food"));
+    (s.food||[]).forEach(o=>add("🍎",o.n,where,[o.d,...(o.l||[])].join(" "),()=>goMonth(s.from,"food")));
+    (s.stim||[]).forEach(a=>add("🧠",a.n,where,[...(a.s||[]),a.w].join(" "),()=>goMonth(s.from,"stim")));
+    (s.tips||[]).forEach(tp=>add("💡",short(tp),where,tp,()=>goMonth(s.from,"tips")));
+    const ms=MILESTONES[s.ck];
+    if(ms && !seenMs[s.ck]){ seenMs[s.ck]=1; add("✅","Logros "+ms.label,where,(ms.items||[]).join(" "),()=>goMonth(s.from,"ms")); }
+  });
+  NORMAL.forEach(n=>add("❓",n.q,"¿Es normal? · "+n.cat,(n.a||"")+" "+(n.c||""),()=>{
+    S.normalQ=n.q; S.normalCat="Todas"; S.libTab="normal"; LS.set("libTab","normal"); S.chapter=null; S.story=null; go("library");
+  }));
+  TALKS.forEach(t=>add(t.ic,t.t,"Cómo hablarle de…",[t.intro,...(t.pasos||[]),...(t.frases||[]),...(t.evitar||[]),t.consultar||""].join(" "),()=>goLib("talk")));
+  CHAPTERS.forEach((c,i)=>{
+    add(c.icon,c.t,"Guía",c.intro||"",()=>openChapter(i));
+    (c.blocks||[]).forEach(b=>add(c.icon,b.h||c.t,"Guía: "+c.t,[b.p||"",...(b.list||[])].join(" "),()=>openChapter(i)));
+    (c.concepts||[]).forEach(k=>add(c.icon,k.t,"Guía: "+c.t,k.d||"",()=>openChapter(i)));
+  });
+  RECIPES.forEach(r=>add("🍲",r.n,"Recetario",(r.ing||[]).join(" "),()=>{
+    S.recQ=r.n; S.recAge=false; S.kitchenTab="recipes"; LS.set("kitchenTab","recipes"); go("kitchen");
+  }));
+  add("🌙","Para dormir: sonidos y rutina","Herramientas · Para dormir",SLEEP_ROUTINE.map(x=>typeof x==="string"?x:JSON.stringify(x)).join(" ")+" dormir sueño noche rutina",()=>goTools("sleep"));
+  return (ASK_INDEX=ix);
+}
+function askSearch(q){
+  const words=norm(q).split(/[^a-z0-9]+/).filter(w=>w.length>=3 && !ASK_STOP.has(w));
+  if(!words.length) return [];
+  const ix=askIndex(), N=ix.length;
+  // Cada palabra (con sus sinónimos) es un grupo; se busca al comienzo de las palabras del contenido
+  const groups=words.map(w=>(ASK_SYN[w] || [w.length>4 ? w.replace(/(es|s)$/,"") : w]).map(v=>" "+v));
+  const has=(txt,g)=>g.some(v=>txt.includes(v));
+  // Las palabras raras pesan más que las que aparecen en todos lados
+  const wt=groups.map(g=>{ const df=ix.filter(it=>has(it.x,g)).length; return Math.log((N+1)/(df+0.5)); });
+  const total=wt.reduce((a,b)=>a+b,0);
+  const seen=new Set();
+  const res=ix.map((it,k)=>{
+      let hit=0, inTitle=0;
+      groups.forEach((g,j)=>{ if(has(it.x,g)) hit+=wt[j]; if(has(it.tn,g)) inTitle+=wt[j]; });
+      return {k,it,hit,score:hit+inTitle*0.5};
+    })
+    .filter(r=>r.hit>0 && r.hit>=total*0.5)
+    .sort((a,b)=>b.score-a.score);
+  return res.filter(r=>r.score>=res[0].score*0.6)
+    .filter(r=>{ const key=r.it.t+"|"+r.it.sub; if(seen.has(key)) return false; seen.add(key); return true; })
+    .slice(0,4);
+}
+function openAsk(q){
+  openModal(`<p class="eyebrow">Dudas frecuentes</p><h2 class="h-serif h-lg">¿Qué querés saber?</h2>
+    <p class="muted">Primero lo buscamos en la app. Si no está, podés buscarlo en internet, en sitios de salud infantil confiables.</p>
+    <div class="ask-form"><input id="askQ" class="input" type="search" enterkeyhint="search" maxlength="120" placeholder="Ej.: piojos, fiebre, tarea" value="${esc(q||"")}" aria-label="Escribí tu duda" onkeydown="if(event.key==='Enter'){event.preventDefault();askRun()}"><button class="btn btn-primary" onclick="askRun()" aria-label="Buscar">🔎</button></div>
+    <div class="ask-chips">${ASK_FAQ.map(f=>`<button class="pill" onclick="askPick(this)">${f}</button>`).join("")}</div>
+    <div id="askOut"></div>
+    <p class="ask-urgent">⚠️ Si le cuesta respirar, está muy decaído, tuvo un golpe fuerte en la cabeza o tiene fiebre alta que no baja, no busques en internet: llamá a su pediatra o andá a la guardia.</p>`);
+  if(q) askRun();
+  else if(window.matchMedia("(min-width:960px)").matches) setTimeout(()=>{ const i=$("askQ"); if(i) i.focus(); },200);
+}
+function askPick(btn){ const i=$("askQ"); if(!i) return; i.value=btn.textContent; askRun(); }
+function askRun(){
+  const inp=$("askQ"), out=$("askOut"); if(!inp||!out) return;
+  const q=inp.value.trim();
+  if(q.length<3){ toast("Escribí tu duda con un poco más de detalle"); inp.focus(); return; }
+  const res=askSearch(q);
+  let h="";
+  if(res.length){
+    h+=`<p class="lbl">Relacionado en la app</p>`+res.map(r=>`<button class="ask-res" onclick="askGo(${r.k})"><span class="ar-ic">${r.it.ic}</span><span class="grow"><strong>${esc(r.it.t)}</strong><small>${esc(r.it.sub)}</small></span></button>`).join("");
+  } else {
+    h+=`<p class="mt" style="font-weight:700">“${esc(q)}” todavía no está en la app.</p>`;
+  }
+  h+=`<div class="ask-web">
+    <p style="font-weight:800">${res.length?"¿No es lo que buscabas? Buscalo en internet":"Buscalo en internet"}</p>
+    <p class="muted" style="font-size:.9rem">En la Sociedad Argentina de Pediatría, la Academia Americana de Pediatría (en español), UNICEF, la OPS y el Ministerio de Salud.</p>
+    <a class="btn btn-primary btn-block mt-s" href="#" target="_blank" rel="noopener" onclick="return askWebClick(this,true)">🌐 Buscar en sitios confiables</a>
+    <a class="btn btn-ghost btn-block mt-s" href="#" target="_blank" rel="noopener" onclick="return askWebClick(this,false)">Buscar en toda la web</a>
+  </div>`;
+  out.innerHTML=h;
+  inp.blur();
+  out.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function askGo(k){ const it=askIndex()[k]; if(!it) return; closeModal(); it.act(); }
+function askUrl(trusted){
+  const i=$("askQ"), t=i?i.value.trim():""; if(!t) return "";
+  const kid=/nin|hij|chic|escuela|colegio/.test(norm(t));
+  const sites=trusted ? " ("+ASK_SITES.map(s=>"site:"+s).join(" OR ")+")" : "";
+  return "https://www.google.com/search?hl=es&q="+encodeURIComponent(t+(kid?"":" niños")+sites);
+}
+function askWebClick(a,trusted){
+  const u=askUrl(trusted);
+  if(!u){ toast("Escribí tu duda primero"); return false; }
+  if(navigator.onLine===false){ toast("Necesitás conexión a internet para buscar fuera de la app"); return false; }
+  a.href=u; return true;
+}
+
 /* ===================== NAVEGACIÓN ===================== */
 function buildNav(){
   $("sbNav").innerHTML = NAV.map(n=>`<button class="sb-item" data-nav="${n.id}" onclick="navGo('${n.id}')"><span>${n.ic}</span>${n.t}</button>`).join("");
@@ -3476,6 +3618,8 @@ function viewHome(){
   } else {
     h+=`<section class="card hero"><p class="eyebrow">Empecemos</p><h2 class="h-serif h-xl" style="margin:4px 0 8px">Contanos de tu hijo o hija</h2><p class="muted">Con su fecha de nacimiento te mostramos la alimentación, las actividades y los logros de su edad. Si tenés más de un hijo, podés sumarlos después.</p><button class="btn btn-primary mt" onclick="openChildForm(null,true)">Completar perfil</button></section>`;
   }
+
+  h+=`<button class="ask-bar mt" onclick="openAsk()"><span class="ab-ic">🔎</span><span>¿Tenés una duda? Buscala acá</span></button>`;
 
   h+=payAskHTML();
 
