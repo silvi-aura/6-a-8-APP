@@ -1,10 +1,10 @@
-/* Service Worker — Silvi-Aura (Crecer acompañados: de 5 a 9 años)
+/* Service Worker — Silvi-Aura (Crecer de 6 a 8)
    Habilita la instalación como app (Android/Chrome) y el uso sin conexión.
    Importante: si más adelante actualizás index.html, subí también un cambio
-   acá (por ejemplo CACHE_NAME "crecer-acompanados-v3") para que los celulares
+   acá (por ejemplo CACHE_NAME "crecer68-v1") para que los celulares
    bajen la versión nueva en vez de servir la vieja desde caché. */
 
-const CACHE_NAME = "crecer-acompanados-v3";
+const CACHE_NAME = "crecer68-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -26,7 +26,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith("crecer68-") && k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f2e8">
-<title>Crecer acompañados: de 5 a 9 años</title>
+<title>Crecer de 6 a 8 años</title>
 
 <!-- ===== PWA: instalación en Android/Chrome y iPhone/Safari ===== -->
 <link rel="manifest" href="manifest.json">
@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Crecer 5 a 9">
+<meta name="apple-mobile-web-app-title" content="Crecer 6 a 8">
 <!-- ===== fin bloque PWA ===== -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -349,6 +349,7 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
 #printArea{display:none}
 @media print{body.printing>*:not(#printArea){display:none!important}body.printing #printArea{display:block!important;color:#000;background:#fff;font-family:Georgia,serif;padding:20px}body.printing #printArea pre{white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.6}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#sbPrem,#tbPrem{display:none!important}
 </style>
 </head>
 <body>
@@ -359,7 +360,7 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
   <div class="w-inner">
     <div class="w-ring">🎒</div>
     <p class="w-brand">Silvi-Aura</p>
-    <h1 class="w-title">Crecer acompañados: de 5 a 9 años</h1>
+    <h1 class="w-title">Crecer de 6 a 8 años</h1>
     <p class="w-quote">“Acompañar sin hacer por ellos: así crecen seguros y autónomos.”</p>
     <p class="w-sub">Alimentación, escuela, emociones y hábitos, año a año, con información de OMS, UNICEF, AAP y guías argentinas.</p>
     <button id="startBtn" class="btn btn-primary btn-lg" onclick="startApp()">Empezar</button>
@@ -371,7 +372,7 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
 <div id="app" class="hidden">
   <aside class="sidebar">
     <p class="sb-brand">Silvi-Aura</p>
-    <p class="sb-title">Crecer acompañados: de 5 a 9 años</p>
+    <p class="sb-title">Crecer de 6 a 8 años</p>
     <button class="child-chip mb" onclick="openChildren()" aria-label="Elegir hijo" style="max-width:100%"></button>
     <nav class="sb-nav" id="sbNav"></nav>
     <div class="sb-foot">
@@ -390,7 +391,7 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
   <div class="main">
     <header class="topbar">
       <div class="tb-row">
-        <div><span class="tb-brand">Crecer acompañados</span><h1 id="tbTitle" class="h-serif tb-title">Inicio</h1></div>
+        <div><span class="tb-brand">Crecer de 6 a 8</span><h1 id="tbTitle" class="h-serif tb-title">Inicio</h1></div>
         <div class="tb-actions">
           <button class="icon-btn" onclick="openAsk()" aria-label="Buscar una duda">🔎</button>
           <button class="icon-btn" id="tbPrem" onclick="openPremium()" aria-label="Premium">👑</button>
@@ -420,6 +421,12 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.5}
 <script>
 /* ===================== CONFIGURACIÓN (editar) ===================== */
 const CONFIG = {
+  // ====== ESTA APP ======
+  minMonth: 72, maxMonth: 107,          // de 6 a 8 años (hasta 8 años y 11 meses)
+  minAge: 6, maxAge: 8,
+  prevAppName: "Crecer de 3 a 5",
+  prevAppUrl: "https://pay.hotmart.com/N108402823D",
+  // ======================
   hotmartCheckoutUrl: "https://pay.hotmart.com/C107664143S",
   priceLabel: "USD 5,99 por mes · cancelás cuando quieras",
   // URL propia que responda {"active": true} o {"active": false} al recibir ?email=...
@@ -447,7 +454,7 @@ const CONFIG = {
 };
 
 /* ===================== ALMACENAMIENTO ===================== */
-const PREFIX = "app_esc59_";
+const PREFIX = "app_c68_";
 const LS = {
   get(k, d){ try{ const v = localStorage.getItem(PREFIX+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)); }catch(e){} }
@@ -904,10 +911,13 @@ const STAGES = [
   ]
  }
 ];
+// Solo las etapas de esta app
+for(let i=STAGES.length-1;i>=0;i--){ if(STAGES[i].to<CONFIG.minMonth||STAGES[i].from>CONFIG.maxMonth) STAGES.splice(i,1); }
+
 const CHAPTERS = [
  {
   "icon": "🍱",
-  "t": "Alimentación en edad escolar: de 5 a 9 años",
+  "t": "Alimentación en edad escolar: de 6 a 8 años",
   "free": true,
   "intro": "Más horas en la escuela, más actividad y más influencia de amigos y publicidad. Estas son las bases para que coma bien sin peleas.",
   "blocks": [
@@ -1131,7 +1141,7 @@ const CHAPTERS = [
  },
  {
   "icon": "📱",
-  "t": "Pantallas, sueño y movimiento de 5 a 9 años",
+  "t": "Pantallas, sueño y movimiento de 6 a 8 años",
   "free": false,
   "intro": "Las pantallas llegan fuerte en la edad escolar. La clave no es solo contar minutos, sino cuidar lo que desplazan: sueño, juego, movimiento y tiempo en familia.",
   "blocks": [
@@ -1589,7 +1599,7 @@ const ING_CAT = {
  ]
 };
 const MENU = {m60:{
- "label": "5 a 9 años",
+ "label": "6 a 8 años",
  "note": "Cuatro comidas en horarios regulares y agua como bebida principal. El almuerzo también sirve como vianda.",
  "slots": [
   {
@@ -3345,9 +3355,9 @@ function ageParts(birthKey, ref){
   if(d<0){ m--; d+=new Date(today.getFullYear(),today.getMonth(),0).getDate(); }
   return {m:Math.max(0,m),d:Math.max(0,d),days};
 }
-function isPremium(){ return !!(S.access && S.access.active); }
+function isPremium(){ return true; } // versión de pago único: todo abierto
 function cid(){ return S.activeId || "sin"; }
-function childMonth(c){ return Math.min(119,Math.max(60,ageParts(c.birth).m)); }
+function childMonth(c){ return Math.min(CONFIG.maxMonth,Math.max(CONFIG.minMonth,ageParts(c.birth).m)); }
 function yearsTxt(m,d){ const y=Math.floor(m/12), r=m%12; return y+" "+(y===1?"año":"años")+(r?" y "+r+" "+(r===1?"mes":"meses"):"")+(d!=null&&!r&&d?" y "+d+" "+(d===1?"día":"días"):""); }
 function babyMonth(){ return S.profile ? childMonth(S.profile) : S.month; }
 function stageFor(m){ return STAGES.find(s=>m>=s.from&&m<=s.to)||STAGES[STAGES.length-1]; }
@@ -3363,7 +3373,7 @@ function syncProfile(){
   if(!S.profiles.find(x=>x.id===S.activeId) || !childAllowed(S.activeId)) S.activeId = S.profiles.length ? S.profiles[0].id : null;
   LS.set("activeChild", S.activeId);
   S.profile = S.profiles.find(x=>x.id===S.activeId) || null;
-  S.month = S.profile ? childMonth(S.profile) : LS.get("month",60);
+  S.month = S.profile ? childMonth(S.profile) : LS.get("month",72);
   S.calc = S.profile ? {birth:S.profile.birth, ga:S.profile.ga} : null;
   S.menuDay = null; S.menuPreview = false;
 }
@@ -3604,7 +3614,7 @@ function viewHome(){
   if(p){
     const a=ageParts(p.birth);
     const txt = `${esc(p.name)} tiene ${yearsTxt(a.m)}`;
-    const out = a.m<60 ? `<div class="fomo">ℹ️ <span>Esta app acompaña de 5 a 9 años. Mientras tanto te mostramos la etapa de 5 años; para los más chicos está la app <strong>Alimentación y estimulación temprana</strong>.</span></div>` : a.m>119 ? `<div class="fomo">ℹ️ <span>Esta app acompaña hasta los 9 años: te mostramos la etapa de 9 años.</span></div>` : "";
+    const out = a.days>=0 && a.m<CONFIG.minMonth ? `<section class="card gilded mt"><p class="eyebrow">📌 Todavía es chiquito para esta app</p><p class="h-serif h-md">Esta app empieza a los 6 años</p><p class="muted mt-s">Para la edad de ${esc(p.name)} está <strong>${esc(CONFIG.prevAppName)}</strong>. Te mostramos el comienzo de esta etapa para que la conozcas.</p><a class="btn btn-gold mt-s" href="${CONFIG.prevAppUrl}" target="_blank" rel="noopener">Conocer ${esc(CONFIG.prevAppName)}</a></section>` : a.m>CONFIG.maxMonth ? `<div class="fomo">ℹ️ <span>Esta app acompaña hasta los 8 años: te mostramos la etapa de 8 años.</span></div>` : "";
     let corr="";
     if(p.ga<37 && a.days>=0 && a.m<24){ const cd=a.days-(40-p.ga)*7; corr=`<p class="muted mt-s">Edad corregida: ${cd<0?"aún no cumple la fecha prevista":Math.floor(cd/30.44)+" meses aprox."}</p>`; }
     const chips = S.profiles.length>1
@@ -3674,7 +3684,7 @@ function viewHome(){
 function premiumBanner(){
   return `<div class="card gilded mt" style="background:var(--hero);border-color:transparent">
     <p class="eyebrow">Acceso Premium</p>
-    <p class="h-serif h-lg" style="margin:4px 0 8px">Todo lo que necesitás, de 5 a 9 años</p>
+    <p class="h-serif h-lg" style="margin:4px 0 8px">Todo lo que necesitás, de 6 a 8 años</p>
     <p class="muted">Cuentos para cada edad, charlas difíciles paso a paso, termómetro de emociones, menú semanal, un juego nuevo cada día y varios hijos en la misma cuenta.</p>
     ${countdownHTML()}
     <div class="row wrap mt"><button class="btn btn-gold" onclick="openPremium()">Ver suscripción</button><button class="btn btn-ghost" onclick="openActivate()">Ya pagué: activar Premium</button></div>
@@ -3721,7 +3731,7 @@ function toggleExp(btn){ btn.parentElement.classList.toggle("open"); }
 
 /* ===================== MES A MES ===================== */
 function goMonth(m,tab){ S.month=m; if(!S.profile) LS.set("month",m); if(tab){ S.monthTab=tab; LS.set("monthTab",tab); } go("month"); }
-function setMonth(m){ m=Math.min(119,Math.max(60,+m)); S.month=m; if(!S.profile) LS.set("month",m); render(true); }
+function setMonth(m){ m=Math.min(CONFIG.maxMonth,Math.max(CONFIG.minMonth,+m)); S.month=m; if(!S.profile) LS.set("month",m); render(true); }
 function setMonthTab(t){ S.monthTab=t; LS.set("monthTab",t); render(true); }
 function centerRibbon(){ const r=document.querySelector(".ribbon"), a=r&&r.querySelector(".mchip.active"); if(r&&a) r.scrollLeft=a.offsetLeft-r.clientWidth/2+a.clientWidth/2; }
 function lockedCard(badge,title,cat){
@@ -3730,7 +3740,7 @@ function lockedCard(badge,title,cat){
 function viewMonth(){
   const m=S.month, st=stageFor(m), prem=isPremium(), bm=S.profile?babyMonth():null;
   let chips="";
-  const chipList=[]; for(let i=60;i<=119;i+=6) chipList.push(i);
+  const chipList=[]; for(let i=CONFIG.minMonth;i<=CONFIG.maxMonth;i+=6) chipList.push(i);
   const activeChip=chipList.filter(x=>x<=m).pop(), babyChip=bm===null?null:chipList.filter(x=>x<=bm).pop();
   for(const i of chipList){ chips+=`<button class="mchip ${i===activeChip?"active":""} ${i===babyChip?"baby":""}" onclick="setMonth(${i})">${i<24?i:Math.floor(i/12)+(i%12?"½":"")}<small>${i<24?"mes":"años"}</small></button>`; }
   let fomo="";
@@ -4125,7 +4135,7 @@ function viewGuides(){
   let h=`<section class="card hero"><p class="eyebrow">Biblioteca</p><h2 class="h-serif h-xl" style="margin:4px 0 8px">Guías por capítulos</h2><p class="muted">Leé a tu ritmo. Cada guía tiene conceptos clave, una lista de acciones y un espacio para escribir.</p></section><div class="stack mt">`;
   CHAPTERS.forEach((c,i)=>{
     const open=c.free||prem;
-    const status=S.read[i]?`<span class="badge ok">✓ Leída</span>`:open?(c.free?`<span class="badge">Libre</span>`:`<span class="badge gold">Premium</span>`):`<span class="badge gold">🔒 Premium</span>`;
+    const status=S.read[i]?`<span class="badge ok">✓ Leída</span>`:open?"":`<span class="badge gold">🔒 Premium</span>`;
     h+=`<button class="card clickable" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;min-height:88px" onclick="openChapter(${i})">
       <span class="ic-bubble cat-${CAT_KEYS[i%4]}">${c.icon}</span>
       <span class="grow"><span class="muted" style="font-size:.85rem">Capítulo ${i+1}</span><span class="h-serif h-md" style="display:block">${c.t}</span><span style="display:block;margin-top:4px">${status}</span></span>
@@ -4193,7 +4203,7 @@ function delNote(id){ if(!confirm("¿Eliminar esta nota?")) return; S.notes=S.no
 
 
 /* ===================== TANDA 1: CUENTOS, CHARLAS, ¿ES NORMAL? Y EMOCIONES ===================== */
-function storyPool(){ const map=new Map(); STORIES.forEach(x=>map.set(x.id,x)); (S.remoteStories||[]).forEach(x=>map.set(x.id,x)); return Array.from(map.values()); }
+function storyPool(){ const map=new Map(); STORIES.forEach(x=>map.set(x.id,x)); (S.remoteStories||[]).forEach(x=>map.set(x.id,x)); return Array.from(map.values()).filter(x=>x.age>=CONFIG.minAge&&x.age<=CONFIG.maxAge); }
 function allStories(){
   const t=todayKey(), list=storyPool().filter(x=>!x.desde||x.desde<=t);
   const dated=list.filter(x=>x.desde).sort((a,b)=>b.desde.localeCompare(a.desde));
@@ -4201,7 +4211,7 @@ function allStories(){
 }
 function upcomingStories(age){ const t=todayKey(); return storyPool().filter(x=>x.desde&&x.desde>t&&(!age||x.age===age)).sort((a,b)=>a.desde.localeCompare(b.desde)); }
 function isNewStory(x){ return !!(x.desde && daysBetween(x.desde,todayKey())<7); }
-function storyAgeDefault(){ return Math.min(9,Math.max(5,Math.floor(babyMonth()/12))); }
+function storyAgeDefault(){ return Math.min(CONFIG.maxAge,Math.max(CONFIG.minAge,Math.floor(babyMonth()/12))); }
 function storyOpen(s){ return !!(s.free || isPremium()); }
 function weeklyStory(){ const age=storyAgeDefault(); const list=allStories().filter(s=>s.age===age); const fresh=list.find(isNewStory); if(fresh) return fresh; return list.length ? list[weekIndex()%list.length] : null; }
 function setStoryAge(a){ S.storyAge=a; render(true); }
@@ -4214,7 +4224,7 @@ function viewStories(){
     const open=storyOpen(wk);
     h+=`<div class="card mt cat-card cat-food"><span class="badge cat">⭐ Cuento de la semana</span><p class="h-serif h-md mt-s">${esc(wk.t)}</p><p class="muted">Para ${wk.age} años · ${wk.min} min de lectura</p><button class="btn ${open?"btn-primary":"btn-gold"} btn-sm mt" onclick="${open?`openStory('${wk.id}')`:"openPremium()"}">${open?"Leer ahora":"🔓 Desbloquear"}</button></div>`;
   }
-  h+=`<div class="row wrap mt">${[5,6,7,8,9].map(a=>`<button class="pill ${a===age?"on":""}" onclick="setStoryAge(${a})">${a} años</button>`).join("")}</div><div class="stack mt">`;
+  h+=`<div class="row wrap mt">${[6,7,8].map(a=>`<button class="pill ${a===age?"on":""}" onclick="setStoryAge(${a})">${a} años</button>`).join("")}</div><div class="stack mt">`;
   allStories().filter(s=>s.age===age).forEach(s=>{
     const read=!!S.checks[cid()+"_story_"+s.id];
     if(storyOpen(s)) h+=`<button class="card clickable" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;min-height:84px" onclick="openStory('${s.id}')"><span class="ic-bubble cat-${CAT_KEYS[s.age%4]}">📖</span><span class="grow"><span class="h-serif h-md" style="display:block">${esc(s.t)}</span><span class="muted" style="font-size:.9rem">${isNewStory(s)?`<span class="badge ok">🆕 Nuevo</span> `:""}${s.min} min${read?` · <strong style="color:var(--accent-text)">✓ Leído</strong>`:""}</span></span><span class="chev">›</span></button>`;
@@ -4324,7 +4334,7 @@ function viewEmotions(){
 function rnd(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function childAge(){ return Math.min(9,Math.max(5,Math.floor(babyMonth()/12))); }
+function childAge(){ return Math.min(CONFIG.maxAge,Math.max(CONFIG.minAge,Math.floor(babyMonth()/12))); }
 function learnStore(){ const k=cid(); if(!S.learn[k]) S.learn[k]={}; return S.learn[k]; }
 function speak(text,lang){
   try{
@@ -4482,7 +4492,7 @@ function viewLearn(){
   <div class="mt">${subTabs([["math","🔢 Matemática","food"],["read","🔤 Lectura","stim"],["eng","🇬🇧 Inglés","ms"]],area,"setLearnArea")}</div><div class="mt-s">`;
   if(area==="eng") return h+viewEnglish()+`</div>`;
   const DATA=area==="math"?LEARN_MATH:LEARN_READ, level=S.learnLevel||childAge(), L=DATA[level], st=learnStore();
-  h+=`<div class="row wrap">${[5,6,7,8,9].map(l=>`<button class="pill ${l===level?"on":""}" onclick="setLearnLevel(${l})">${learnLevelOpen(l)?"":"🔒 "}${l} años</button>`).join("")}</div>`;
+  h+=`<div class="row wrap">${[6,7,8].map(l=>`<button class="pill ${l===level?"on":""}" onclick="setLearnLevel(${l})">${learnLevelOpen(l)?"":"🔒 "}${l} años</button>`).join("")}</div>`;
   const best=st[area+"_"+level];
   h+=`<div class="card mt cat-card cat-${area==="math"?"food":"stim"}"><span class="badge cat">Nivel ${level} años</span><h3 class="h-serif h-md mt-s">${L.t}</h3><p class="muted">${L.d}</p>
     ${best!=null?`<p class="mt-s">🏆 Mejor puntaje: <strong>${best}%</strong></p>`:""}
@@ -4646,6 +4656,7 @@ function closeModal(){ $("modal").classList.add("hidden"); document.body.style.o
 function openProfile(first){ if(S.profile && !first) openChildForm(S.profile.id); else openChildForm(null,first); }
 
 function openPremium(){
+  return; // versión de pago único: sin pantalla de suscripción
   const prem=isPremium(), st=stageFor(babyMonth());
   if(prem){
     openModal(`<p class="eyebrow">Tu suscripción</p><h2 class="h-serif h-lg">Premium activo ✅</h2><p class="muted">Acceso con: <strong style="color:var(--text)">${esc(S.access.email)}</strong></p>
@@ -4749,7 +4760,7 @@ function logoutAccess(){ S.access=null; LS.set("access",null); syncProfile(); cl
 
 function installSectionHTML(){
   if(isStandalone()){
-    return `<div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">📲 App instalada</p><p class="muted">Ya estás usando Crecer acompañados como aplicación. ✅</p></div>`;
+    return `<div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">📲 App instalada</p><p class="muted">Ya estás usando Crecer de 6 a 8 como aplicación. ✅</p></div>`;
   }
   if(deferredInstallPrompt){
     return `<div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">📲 Instalar la app</p><p class="muted">Sumala a tu pantalla de inicio para abrirla como una app, sin el navegador.</p><button class="btn btn-primary btn-sm mt-s" onclick="installApp()">Instalar app</button></div>`;
@@ -4764,7 +4775,6 @@ function openSettings(){
     ${installSectionHTML()}
     <div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">👧👦 Hijos</p><p class="muted">${S.profiles.length?S.profiles.map(c=>esc(c.name)).join(", "):"Sin perfiles todavía"}</p><button class="btn btn-ghost btn-sm mt-s" onclick="openChildren()">Gestionar hijos</button></div>
     <div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">🌙 Apariencia</p><button class="btn btn-ghost btn-sm mt-s themeBtn" onclick="toggleTheme()">Cambiar modo</button></div>
-    <div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">👑 Suscripción</p><p class="muted">${isPremium()?"Premium activo":"Plan libre"}</p><button class="btn btn-gold btn-sm mt-s" onclick="openPremium()">${isPremium()?"Ver suscripción":"Ver Premium"}</button></div>
     <div class="card mt" style="box-shadow:none;background:var(--bg-2)"><p style="font-weight:800">🗑️ Datos</p><p class="muted">Tus notas, respuestas y registros se guardan solo en este dispositivo.</p><button class="btn btn-danger btn-sm mt-s" onclick="resetAll()">Borrar todos mis datos</button></div>`);
   applyTheme();
 }
@@ -4798,7 +4808,6 @@ async function loadUpdates(){
   if(S.profiles.length) $("startBtn").textContent="Continuar";
   loadUpdates();
   loadStories();
-  if(S.access && CONFIG.verifyEndpoint && Date.now()-S.access.checked > CONFIG.recheckHours*36e5) reverify(true);
   setInterval(tickCountdown,1000);
 })();
 </script>
